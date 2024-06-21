@@ -38,6 +38,11 @@ set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${ffmpeg_lib_dir}/
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
         native-lib.cpp
+        WlAudio.cpp
+        WlCallJava.cpp
+        WlFFmpeg.cpp
+        WlPlayStatus.cpp
+        WlQueue.cpp
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
