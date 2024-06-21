@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project("audioplayer")
 
-set(CMAKE_TOOLCHAIN_FILE ${ANDROID_NDK}/build/cmake/android.toolchain.cmake)
-
 set(ffmpeg_lib_dir ${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
 set(ffmpeg_head_dir ${CMAKE_SOURCE_DIR}/include)
 
@@ -40,9 +38,6 @@ set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION ${ffmpeg_lib_dir}/
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
         native-lib.cpp
-        WIAudio.cpp
-        WIQueue.cpp
-        WIPlaystatus.cpp
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
