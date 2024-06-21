@@ -41,7 +41,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         WlAudio.cpp
         WlCallJava.cpp
         WlFFmpeg.cpp
-        WlPlayStatus.cpp
+        WlPlaystatus.cpp
         WlQueue.cpp
 )
 
