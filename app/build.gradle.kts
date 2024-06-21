@@ -6,6 +6,14 @@ android {
     namespace = "com.hgz.audioplayer"
     compileSdk = 34
 
+    sourceSets {
+        getByName("main") {
+            java.srcDir("src/main/java")
+            jniLibs.srcDir("src/main/jniLibs")
+        }
+    }
+
+
     defaultConfig {
         applicationId = "com.hgz.audioplayer"
         minSdk = 24
@@ -14,6 +22,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters.add("armeabi-v7a")
+            abiFilters.add("arm64-v8a")
+            abiFilters.add("x86_64")
+        }
+
     }
 
     buildTypes {
