@@ -11,6 +11,7 @@ _JavaVM *javaVM = NULL;
 WlCallJava *callJava = NULL;
 WlFFmpeg *fFmpeg = NULL;
 WlPlaystatus *playstatus = NULL;
+bool native_exit = true;
 
 extern "C"
 JNIEXPORT jint JNICALL
@@ -67,6 +68,10 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1resume(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_hgz_audioplayer_player_WlPlayer_n_1stop(JNIEnv *env, jobject thiz) {
+    if(!native_exit) {
+        return;
+    }
+    native_exit = false;
     if (fFmpeg != NULL) {
         fFmpeg->release();
         delete (fFmpeg);
@@ -80,4 +85,5 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1stop(JNIEnv *env, jobject thiz) {
             playstatus = NULL;
         }
     }
+    native_exit = true;
 }

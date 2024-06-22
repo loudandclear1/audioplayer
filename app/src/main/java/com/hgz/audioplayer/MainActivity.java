@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("SdCardPath")
     public void begin(View view) {
-        wlPlayer.setSource("/sdcard/1.mp3");
+        wlPlayer.setSource("/sdcard/DysonSphere.flac");
         wlPlayer.prepared();
     }
 
