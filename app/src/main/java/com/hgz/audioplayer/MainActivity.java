@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         wlPlayer.setWlOnPreparedListener(new WlOnPreparedListener() {
             @Override
             public void onPrepared() {
+                Log.d("hgz", "准备好了，可以开始播放声音了");
                 wlPlayer.start();
             }
         });

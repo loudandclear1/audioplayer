@@ -13,6 +13,18 @@ WlFFmpeg *fFmpeg = NULL;
 WlPlaystatus *playstatus = NULL;
 
 extern "C"
+JNIEXPORT jint JNICALL
+JNI_OnLoad(JavaVM *vm, void *reserved) {
+    jint result = -1;
+    javaVM = vm;
+    JNIEnv *env;
+    if (vm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
+        return result;
+    }
+    return JNI_VERSION_1_4;
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_hgz_audioplayer_player_WlPlayer_n_1prepared(JNIEnv *env, jobject thiz, jstring source_) {
     const char *source = env->GetStringUTFChars(source_, 0);
@@ -31,7 +43,7 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1prepared(JNIEnv *env, jobject thiz, 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_hgz_audioplayer_player_WlPlayer_n_1start(JNIEnv *env, jobject thiz) {
-    if(fFmpeg != NULL) {
+    if (fFmpeg != NULL) {
         fFmpeg->start();
     }
 }
@@ -39,7 +51,7 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1start(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_hgz_audioplayer_player_WlPlayer_n_1pause(JNIEnv *env, jobject thiz) {
-    if(fFmpeg != NULL) {
+    if (fFmpeg != NULL) {
         fFmpeg->pause();
     }
 }
@@ -47,7 +59,7 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1pause(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_hgz_audioplayer_player_WlPlayer_n_1resume(JNIEnv *env, jobject thiz) {
-    if(fFmpeg != NULL) {
+    if (fFmpeg != NULL) {
         fFmpeg->resume();
     }
 }
@@ -55,16 +67,16 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1resume(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_hgz_audioplayer_player_WlPlayer_n_1stop(JNIEnv *env, jobject thiz) {
-    if(fFmpeg != NULL) {
+    if (fFmpeg != NULL) {
         fFmpeg->release();
-        delete(fFmpeg);
+        delete (fFmpeg);
         fFmpeg = NULL;
-        if(callJava != NULL) {
-            delete(callJava);
+        if (callJava != NULL) {
+            delete (callJava);
             callJava = NULL;
         }
-        if(playstatus != NULL) {
-            delete(playstatus);
+        if (playstatus != NULL) {
+            delete (playstatus);
             playstatus = NULL;
         }
     }
