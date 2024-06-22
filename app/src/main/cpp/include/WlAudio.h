@@ -60,7 +60,7 @@ public:
 
     void initOpenSLES();
 
-    int getCurrentSampleRateForOpenSles(int sample_rate);
+    int getCurrentSampleRateForOpensles(int sample_rate);
 
     void pause();
 
