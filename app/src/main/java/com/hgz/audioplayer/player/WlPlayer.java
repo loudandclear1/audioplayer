@@ -16,7 +16,7 @@ public class WlPlayer {
 
     private String source;//数据源
     private static WlTimeInfoBean wlTimeInfoBean;
-    private WlOnPreparedListener wlOnParparedListener;
+    private WlOnPreparedListener wlOnPreparedListener;
     private WlOnLoadListener wlOnLoadListener;
     private WlOnPauseResumeListener wlOnPauseResumeListener;
     private WlOnTimeInfoListener wlOnTimeInfoListener;
@@ -36,11 +36,11 @@ public class WlPlayer {
 
     /**
      * 设置准备接口回调
-     * @param wlOnParparedListener
+     * @param wlOnPreparedListener
      */
-    public void setWlOnParparedListener(WlOnPreparedListener wlOnParparedListener)
+    public void setWlOnPreparedListener(WlOnPreparedListener wlOnPreparedListener)
     {
-        this.wlOnParparedListener = wlOnParparedListener;
+        this.wlOnPreparedListener = wlOnPreparedListener;
     }
 
     public void setWlOnLoadListener(WlOnLoadListener wlOnLoadListener) {
@@ -55,7 +55,7 @@ public class WlPlayer {
         this.wlOnTimeInfoListener = wlOnTimeInfoListener;
     }
 
-    public void parpared()
+    public void prepared()
     {
         if(TextUtils.isEmpty(source))
         {
@@ -118,11 +118,11 @@ public class WlPlayer {
     /**
      * c++回调java的方法
      */
-    public void onCallParpared()
+    public void onCallPrepared()
     {
-        if(wlOnParparedListener != null)
+        if(wlOnPreparedListener != null)
         {
-            wlOnParparedListener.onParpared();
+            wlOnPreparedListener.onPrepared();
         }
     }
 
