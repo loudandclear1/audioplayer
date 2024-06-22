@@ -3,6 +3,7 @@
 
 #include "jni.h"
 #include <linux/stddef.h>
+#include "AndroidLog.h"
 
 #define MAIN_THREAD 0
 #define CHILD_THREAD 1

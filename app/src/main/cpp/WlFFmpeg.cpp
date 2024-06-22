@@ -30,16 +30,28 @@ void WlFFmpeg::decodeFFmpegThread() {
     pthread_mutex_lock(&init_mutex);
     avformat_network_init();
     pFormatCtx = avformat_alloc_context();
+    if (!pFormatCtx) {
+        LOGE("Could not allocate AVFormatContext");
+        return;
+    }
 
     pFormatCtx->interrupt_callback.callback = avformat_callback;
     pFormatCtx->interrupt_callback.opaque = this;
 
     if (avformat_open_input(&pFormatCtx, url, NULL, NULL) != 0) {
+        if(LOG_DEBUG)
+        {
+            LOGE("can not open url :%s", url);
+        }
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
     }
     if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
+        if(LOG_DEBUG)
+        {
+            LOGE("can not find streams from %s", url);
+        }
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -60,6 +72,10 @@ void WlFFmpeg::decodeFFmpegThread() {
 
     AVCodec *codec = const_cast<AVCodec *>(avcodec_find_decoder(audio->codecpar->codec_id));
     if (!codec) {
+        if(LOG_DEBUG)
+        {
+            LOGE("can not find decoder");
+        }
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -67,18 +83,30 @@ void WlFFmpeg::decodeFFmpegThread() {
 
     audio->avCodecContext = avcodec_alloc_context3(codec);
     if (!audio->avCodecContext) {
+        if(LOG_DEBUG)
+        {
+            LOGE("can not alloc new decodecctx");
+        }
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
     }
 
     if (avcodec_parameters_to_context(audio->avCodecContext, audio->codecpar) < 0) {
+        if(LOG_DEBUG)
+        {
+            LOGE("can not fill decodecctx");
+        }
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
     }
 
     if (avcodec_open2(audio->avCodecContext, codec, 0) != 0) {
+        if(LOG_DEBUG)
+        {
+            LOGE("cant not open audio strames");
+        }
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -96,6 +124,11 @@ void WlFFmpeg::decodeFFmpegThread() {
 
 void WlFFmpeg::start() {
     if (audio == NULL) {
+        if(LOG_DEBUG)
+        {
+            LOGE("audio is null");
+            return;
+        }
         return;
     }
     audio->play();
@@ -123,6 +156,10 @@ void WlFFmpeg::start() {
         }
     }
     exit = true;
+    if(LOG_DEBUG)
+    {
+        LOGD("解码完成");
+    }
 }
 
 void WlFFmpeg::pause() {
@@ -138,8 +175,16 @@ void WlFFmpeg::resume() {
 }
 
 void WlFFmpeg::release() {
+    if(LOG_DEBUG)
+    {
+        LOGE("开始释放Ffmpe");
+    }
     if (playstatus->exit) {
         return;
+    }
+    if(LOG_DEBUG)
+    {
+        LOGE("开始释放ffmpe");
     }
     playstatus->exit = true;
 
@@ -149,8 +194,16 @@ void WlFFmpeg::release() {
         if (sleepCount > 1000) {
             exit = true;
         }
+        if(LOG_DEBUG)
+        {
+            LOGE("wait ffmpeg  exit %d", sleepCount);
+        }
         sleepCount++;
         av_usleep(1000 * 10);
+    }
+    if(LOG_DEBUG)
+    {
+        LOGE("释放 Audio");
     }
 
     if (audio != NULL) {
@@ -158,17 +211,26 @@ void WlFFmpeg::release() {
         delete (audio);
         audio = NULL;
     }
-
+    if(LOG_DEBUG)
+    {
+        LOGE("释放 封装格式上下文");
+    }
     if (pFormatCtx != NULL) {
         avformat_close_input(&pFormatCtx);
         avformat_free_context(pFormatCtx);
         pFormatCtx = NULL;
     }
-
+    if(LOG_DEBUG)
+    {
+        LOGE("释放 callJava");
+    }
     if (callJava != NULL) {
         callJava = NULL;
     }
-
+    if(LOG_DEBUG)
+    {
+        LOGE("释放 playstatus");
+    }
     if (playstatus != NULL) {
         playstatus = NULL;
     }

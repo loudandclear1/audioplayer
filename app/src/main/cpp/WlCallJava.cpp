@@ -8,6 +8,10 @@ WlCallJava::WlCallJava(_JavaVM *javaVM, JNIEnv *env, jobject *obj) {
 
     jclass jlz = jniEnv->GetObjectClass(jobj);
     if (!jlz) {
+        if(LOG_DEBUG)
+        {
+            LOGE("get jclass wrong");
+        }
         return;
     }
 
@@ -23,6 +27,10 @@ void WlCallJava::onCallPrepared(int type) {
     } else if (type == CHILD_THREAD) {
         JNIEnv *jniEnv;
         if (javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+            if(LOG_DEBUG)
+            {
+                LOGE("get child thread jnienv wrong");
+            }
             return;
         }
         jniEnv->CallVoidMethod(jobj, jmid_prepared);
@@ -36,6 +44,10 @@ void WlCallJava::onCallLoad(int type, bool load) {
     } else if (type == CHILD_THREAD) {
         JNIEnv *jniEnv;
         if (javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+            if(LOG_DEBUG)
+            {
+                LOGE("call onCallTimeInfo wrong");
+            }
             return;
         }
         jniEnv->CallVoidMethod(jobj, jmid_load, load);
@@ -49,6 +61,10 @@ void WlCallJava::onCallTimeInfo(int type, int curr, int total) {
     } else if (type == CHILD_THREAD) {
         JNIEnv *jniEnv;
         if (javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+            if(LOG_DEBUG)
+            {
+                LOGE("call onCallTimeInfo wrong");
+            }
             return;
         }
         jniEnv->CallVoidMethod(jobj, jmid_timeinfo, curr, total);

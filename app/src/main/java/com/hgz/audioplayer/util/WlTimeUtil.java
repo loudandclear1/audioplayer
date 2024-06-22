@@ -1,9 +1,5 @@
 package com.hgz.audioplayer.util;
 
-/**
- * Created by ywl on 2017-12-22.
- */
-
 public class WlTimeUtil {
 
     /**

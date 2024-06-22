@@ -2,6 +2,7 @@ package com.hgz.audioplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -71,8 +72,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SdCardPath")
     public void begin(View view) {
-        wlPlayer.setSource("/sdcard/DysonSphere.flac");
+        wlPlayer.setSource("/sdcard/1.mp3");
         wlPlayer.prepared();
     }
 

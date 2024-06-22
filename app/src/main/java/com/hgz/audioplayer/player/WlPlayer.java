@@ -8,6 +8,7 @@ import com.hgz.audioplayer.listener.WlOnPauseResumeListener;
 import com.hgz.audioplayer.listener.WlOnPreparedListener;
 import com.hgz.audioplayer.listener.WlOnTimeInfoListener;
 import com.hgz.audioplayer.WlTimeInfoBean;
+import com.hgz.audioplayer.log.MyLog;
 
 public class WlPlayer {
 
@@ -58,7 +59,7 @@ public class WlPlayer {
 
     public void prepared() {
         if (TextUtils.isEmpty(source)) {
-            Log.d("hgz", "source is not empty");
+            MyLog.d("source not be empty");
             return;
         }
         new Thread(new Runnable() {
@@ -72,7 +73,7 @@ public class WlPlayer {
 
     public void start() {
         if (TextUtils.isEmpty(source)) {
-            Log.d("hgz", "source is empty");
+            MyLog.d("source is empty");
             return;
         }
         new Thread(new Runnable() {
