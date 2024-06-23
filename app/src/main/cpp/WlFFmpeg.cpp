@@ -76,7 +76,8 @@ void WlFFmpeg::decodeFFmpegThread() {
                 int num = pFormatCtx->streams[i]->avg_frame_rate.num;
                 int den = pFormatCtx->streams[i]->avg_frame_rate.den;
                 if (num != 0 && den != 0) {
-                    video->defaultDelayTime = 1.0 * den / num;
+                    int fps = num / den;
+                    video->defaultDelayTime = 1.0 / fps;
                 }
             }
         }
