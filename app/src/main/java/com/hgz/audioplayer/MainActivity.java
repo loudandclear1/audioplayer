@@ -14,6 +14,7 @@ import com.hgz.audioplayer.listener.WlOnLoadListener;
 import com.hgz.audioplayer.listener.WlOnPauseResumeListener;
 import com.hgz.audioplayer.listener.WlOnPreparedListener;
 import com.hgz.audioplayer.listener.WlOnTimeInfoListener;
+import com.hgz.audioplayer.opengl.WlGLSurfaceView;
 import com.hgz.audioplayer.player.WlPlayer;
 import com.hgz.audioplayer.util.WlTimeUtil;
 
@@ -27,12 +28,18 @@ public class MainActivity extends AppCompatActivity {
     private WlPlayer wlPlayer;
     private TextView tvTime;
 
+    private WlGLSurfaceView wlGLSurfaceView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvTime = findViewById(R.id.tv_time);
+        wlGLSurfaceView = findViewById(R.id.wlglsurfaceview);
         wlPlayer = new WlPlayer();
+        wlPlayer.setWlGLSurfaceView(wlGLSurfaceView);
+
         wlPlayer.setWlOnPreparedListener(new WlOnPreparedListener() {
             @Override
             public void onPrepared() {
@@ -61,12 +68,10 @@ public class MainActivity extends AppCompatActivity {
         wlPlayer.setWlOnTimeInfoListener(new WlOnTimeInfoListener() {
             @Override
             public void onTimeInfo(WlTimeInfoBean timeInfoBean) {
-//                MyLog.d(timeInfoBean.toString());
                 Message message = Message.obtain();
                 message.what = 1;
                 message.obj = timeInfoBean;
                 handler.sendMessage(message);
-
             }
         });
 
@@ -74,21 +79,21 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("SdCardPath")
     public void begin(View view) {
-        wlPlayer.setSource("/sdcard/DysonSphere.flac");
+        wlPlayer.setSource("/sdcard/1.mp4");
         wlPlayer.prepared();
     }
 
     public void pause(View view) {
-
         wlPlayer.pause();
-
     }
 
     public void resume(View view) {
         wlPlayer.resume();
     }
 
+    @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);

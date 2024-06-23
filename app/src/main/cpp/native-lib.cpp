@@ -12,6 +12,7 @@ WlCallJava *callJava = NULL;
 WlFFmpeg *fFmpeg = NULL;
 WlPlaystatus *playstatus = NULL;
 bool native_exit = true;
+pthread_t thread_start;
 
 extern "C"
 JNIEXPORT jint JNICALL
@@ -41,11 +42,18 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1prepared(JNIEnv *env, jobject thiz, 
     }
 }
 
+void *startCallBack(void *data)
+{
+    WlFFmpeg *fFmpeg = (WlFFmpeg *) data;
+    fFmpeg->start();
+    pthread_exit(&thread_start);
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_hgz_audioplayer_player_WlPlayer_n_1start(JNIEnv *env, jobject thiz) {
     if (fFmpeg != NULL) {
-        fFmpeg->start();
+        pthread_create(&thread_start, NULL, startCallBack, fFmpeg);
     }
 }
 

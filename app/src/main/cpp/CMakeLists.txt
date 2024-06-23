@@ -43,6 +43,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         WlFFmpeg.cpp
         WlPlaystatus.cpp
         WlQueue.cpp
+        WlVideo.cpp
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}

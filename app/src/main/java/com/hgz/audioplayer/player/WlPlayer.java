@@ -9,6 +9,7 @@ import com.hgz.audioplayer.listener.WlOnPreparedListener;
 import com.hgz.audioplayer.listener.WlOnTimeInfoListener;
 import com.hgz.audioplayer.WlTimeInfoBean;
 import com.hgz.audioplayer.log.MyLog;
+import com.hgz.audioplayer.opengl.WlGLSurfaceView;
 
 public class WlPlayer {
 
@@ -23,6 +24,8 @@ public class WlPlayer {
     private WlOnPauseResumeListener wlOnPauseResumeListener;
     private WlOnTimeInfoListener wlOnTimeInfoListener;
 
+    private WlGLSurfaceView wlGLSurfaceView;
+
 
     public WlPlayer() {
     }
@@ -34,6 +37,10 @@ public class WlPlayer {
      */
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public void setWlGLSurfaceView(WlGLSurfaceView wlGLSurfaceView) {
+        this.wlGLSurfaceView = wlGLSurfaceView;
     }
 
     /**
@@ -99,6 +106,7 @@ public class WlPlayer {
     }
 
     public void stop() {
+        wlTimeInfoBean = null;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -134,6 +142,14 @@ public class WlPlayer {
         }
     }
 
+    public void onCallRenderYUV(int width, int height, byte[] y, byte[] u, byte[] v) {
+        MyLog.d("获取到视频的yuv数据");
+        if (wlGLSurfaceView != null) {
+            MyLog.d("调用setYUVData");
+            wlGLSurfaceView.setYUVData(width, height, y, u, v);
+        }
+    }
+
 
     private native void n_prepared(String source);
 
@@ -144,6 +160,5 @@ public class WlPlayer {
     private native void n_resume();
 
     private native void n_stop();
-
 
 }
