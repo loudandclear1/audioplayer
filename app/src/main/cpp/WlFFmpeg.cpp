@@ -119,6 +119,18 @@ void WlFFmpeg::start() {
     video->play();
 
     while (playstatus != NULL && !playstatus->exit) {
+        if(playstatus->seek)
+        {
+            av_usleep(1000 * 100);
+            continue;
+        }
+
+        if(audio->queue->getQueueSize() > 40)
+        {
+            av_usleep(1000 * 100);
+            continue;
+        }
+
         AVPacket *avPacket = av_packet_alloc();
         if (av_read_frame(pFormatCtx, avPacket) == 0) {
             if (avPacket->stream_index == audio->streamIndex) {
@@ -290,7 +302,7 @@ void WlFFmpeg::seek(int64_t seconds) {
         playstatus->seek = true;
         pthread_mutex_lock(&seek_mutex);
         int64_t rel = seconds * AV_TIME_BASE;
-        avformat_seek_file(pFormatCtx, -1, INT64_MIN, rel, INT16_MAX, 0);
+        avformat_seek_file(pFormatCtx, -1, INT64_MIN, rel, INT64_MAX, 0);
 
         if (audio != NULL) {
             audio->queue->clearAvpacket();

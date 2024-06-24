@@ -23,3 +23,19 @@ if (num != 0 && den != 0) {
 
 现在视频暂停，播放，停止功能都已经实现，进度条也可以显示，但是seek有bug
 
+
+
+知道怎么回事了。。。这是原来的写法，我个fool
+
+```c++
+avformat_seek_file(pFormatCtx, -1, INT64_MIN, rel, INT16_MAX, 0);
+```
+
+正确写法
+
+```c++
+avformat_seek_file(pFormatCtx, -1, INT64_MIN, rel, INT64_MAX, 0);
+```
+
+还在找什么地方没加锁，什么地方没释放锁，反复查看seek逻辑，结果发现是自己写错了一个单词。。。
+

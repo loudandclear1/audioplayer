@@ -48,7 +48,7 @@
             android:layout_weight="1"
             android:text="播放"
             android:onClick="resume"/>
-        
+
     </LinearLayout>
 
     <TextView

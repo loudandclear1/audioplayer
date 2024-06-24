@@ -8,6 +8,8 @@ WlQueue::WlQueue(WlPlaystatus *playstatus) {
 
 WlQueue::~WlQueue() {
     clearAvpacket();
+    pthread_mutex_destroy(&mutexPacket);
+    pthread_cond_destroy(&condPacket);
 }
 
 int WlQueue::putAvpacket(AVPacket *packet) {

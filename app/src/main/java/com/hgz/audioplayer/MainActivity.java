@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("SdCardPath")
     public void begin(View view) {
-        wlPlayer.setSource("/sdcard/1.mp4");
+        wlPlayer.setSource("/sdcard/oceans.mp4");
         wlPlayer.prepared();
     }
 

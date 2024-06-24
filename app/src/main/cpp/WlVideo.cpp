@@ -13,13 +13,11 @@ void *playVideo(void *data) {
 
     while (video->playstatus != NULL && !video->playstatus->exit) {
 
-        if(video->playstatus->seek)
-        {
+        if (video->playstatus->seek) {
             av_usleep(1000 * 100);
             continue;
         }
-        if(video->playstatus->pause)
-        {
+        if (video->playstatus->pause) {
             av_usleep(1000 * 100);
             continue;
         }
@@ -163,8 +161,10 @@ void WlVideo::release() {
         queue = NULL;
     }
     if (avCodecContext != NULL) {
+        pthread_mutex_lock(&codecMutex);
         avcodec_free_context(&avCodecContext);
         avCodecContext = NULL;
+        pthread_mutex_unlock(&codecMutex);
     }
 
     if (playstatus != NULL) {

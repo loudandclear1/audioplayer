@@ -26,11 +26,19 @@ void WlAudio::play() {
 int WlAudio::resampleAudio() {
     data_size = 0;
     while (playstatus != NULL && !playstatus->exit) {
+
+        if(playstatus->seek)
+        {
+            av_usleep(1000 * 100);
+            continue;
+        }
+
         if (queue->getQueueSize() == 0) { // 加载中
             if (!playstatus->load) {
                 playstatus->load = true;
                 callJava->onCallLoad(CHILD_THREAD, true);
             }
+            av_usleep(1000 * 100);
             continue;
         } else {
             if (playstatus->load) {
