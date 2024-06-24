@@ -55,6 +55,7 @@ void *playVideo(void *data) {
             LOGE("diff is %f", diff);
 
             av_usleep(video->getDelayTime(diff) * 1000000);
+
             video->wlCallJava->onCallRenderYUV(
                     video->avCodecContext->width,
                     video->avCodecContext->height,
@@ -101,6 +102,12 @@ void *playVideo(void *data) {
                     pFrameYUV420P->data,
                     pFrameYUV420P->linesize
             );
+
+            double diff = video->getFrameDiffTime(avFrame);
+            LOGE("diff is %f", diff);
+
+            av_usleep(video->getDelayTime(diff) * 1000000);
+
             video->wlCallJava->onCallRenderYUV(
                     video->avCodecContext->width,
                     video->avCodecContext->height,
@@ -170,14 +177,14 @@ double WlVideo::getFrameDiffTime(AVFrame *avFrame) {
 
 double WlVideo::getDelayTime(double diff) {
     if (diff > 0.003) {
-        delayTime = delayTime * 2 / 3;
+        delayTime = delayTime / 4;
         if (delayTime < defaultDelayTime / 2) {
             delayTime = defaultDelayTime / 2;
         } else if (delayTime > defaultDelayTime * 2) {
             delayTime = defaultDelayTime * 2;
         }
     } else if (diff < -0.003) {
-        delayTime = delayTime * 3 / 2;
+        delayTime = delayTime * 0.25;
         if (delayTime > defaultDelayTime * 2) {
             delayTime = defaultDelayTime * 2;
         } else if (delayTime < defaultDelayTime / 2) {
@@ -186,9 +193,9 @@ double WlVideo::getDelayTime(double diff) {
     }
 
     if (diff >= 0.5) {
-        delayTime = defaultDelayTime / 4;
+        delayTime = defaultDelayTime / 1.5;
     } else if (diff <= -0.5) {
-        delayTime = defaultDelayTime * 4;
+        delayTime = defaultDelayTime * 1.5;
     }
 
     return delayTime;
