@@ -137,7 +137,10 @@ void WlFFmpeg::start() {
                     av_usleep(1000 * 100);
                     continue;
                 } else {
-                    playstatus->exit = true;
+                    if (!playstatus->seek) {
+                        av_usleep(1000 * 100);
+                        playstatus->exit = true;
+                    }
                     break;
                 }
             }
@@ -151,46 +154,43 @@ void WlFFmpeg::start() {
 }
 
 void WlFFmpeg::pause() {
+    if (playstatus != NULL) {
+        playstatus->pause = true;
+    }
+
     if (audio != NULL) {
         audio->pause();
     }
 }
 
 void WlFFmpeg::resume() {
+    if (playstatus != NULL) {
+        playstatus->pause = false;
+    }
     if (audio != NULL) {
         audio->resume();
     }
 }
 
 void WlFFmpeg::release() {
-    if(LOG_DEBUG)
-    {
+    if (LOG_DEBUG) {
         LOGE("开始释放Ffmpe");
     }
-    if (playstatus->exit) {
-        return;
-    }
-    if(LOG_DEBUG)
-    {
-        LOGE("开始释放ffmpe");
-    }
     playstatus->exit = true;
-
     pthread_mutex_lock(&init_mutex);
     int sleepCount = 0;
     while (!exit) {
         if (sleepCount > 1000) {
             exit = true;
         }
-        if(LOG_DEBUG)
-        {
+        if (LOG_DEBUG) {
             LOGE("wait ffmpeg  exit %d", sleepCount);
         }
         sleepCount++;
-        av_usleep(1000 * 10);
+        av_usleep(1000 * 10);//暂停10毫秒
     }
-    if(LOG_DEBUG)
-    {
+
+    if (LOG_DEBUG) {
         LOGE("释放 Audio");
     }
 
@@ -199,8 +199,16 @@ void WlFFmpeg::release() {
         delete (audio);
         audio = NULL;
     }
-    if(LOG_DEBUG)
-    {
+    if (LOG_DEBUG) {
+        LOGE("释放 video");
+    }
+    if (video != NULL) {
+        video->release();
+        delete (video);
+        video = NULL;
+    }
+
+    if (LOG_DEBUG) {
         LOGE("释放 封装格式上下文");
     }
     if (pFormatCtx != NULL) {
@@ -208,26 +216,24 @@ void WlFFmpeg::release() {
         avformat_free_context(pFormatCtx);
         pFormatCtx = NULL;
     }
-    if(LOG_DEBUG)
-    {
+    if (LOG_DEBUG) {
         LOGE("释放 callJava");
     }
     if (callJava != NULL) {
         callJava = NULL;
     }
-    if(LOG_DEBUG)
-    {
+    if (LOG_DEBUG) {
         LOGE("释放 playstatus");
     }
     if (playstatus != NULL) {
         playstatus = NULL;
     }
-
     pthread_mutex_unlock(&init_mutex);
 }
 
 WlFFmpeg::~WlFFmpeg() {
     pthread_mutex_destroy(&init_mutex);
+    pthread_mutex_destroy(&seek_mutex);
 }
 
 int WlFFmpeg::getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCodecContext) {
@@ -271,4 +277,39 @@ int WlFFmpeg::getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCo
     }
 
     return 0;
+}
+
+void WlFFmpeg::seek(int64_t seconds) {
+
+    LOGE("seek time %d", seconds);
+    if (duration <= 0) {
+        return;
+    }
+
+    if (seconds >= 0 && seconds <= duration) {
+        playstatus->seek = true;
+        pthread_mutex_lock(&seek_mutex);
+        int64_t rel = seconds * AV_TIME_BASE;
+        avformat_seek_file(pFormatCtx, -1, INT64_MIN, rel, INT16_MAX, 0);
+
+        if (audio != NULL) {
+            audio->queue->clearAvpacket();
+            audio->clock = 0;
+            audio->last_time = 0;
+            pthread_mutex_lock(&audio->codecMutex);
+            avcodec_flush_buffers(audio->avCodecContext);
+            pthread_mutex_unlock(&audio->codecMutex);
+        }
+
+        if (video != NULL) {
+            video->queue->clearAvpacket();
+            video->clock = 0;
+            pthread_mutex_lock(&video->codecMutex);
+            avcodec_flush_buffers(video->avCodecContext);
+            pthread_mutex_unlock(&video->codecMutex);
+        }
+
+        pthread_mutex_unlock(&seek_mutex);
+        playstatus->seek = false;
+    }
 }

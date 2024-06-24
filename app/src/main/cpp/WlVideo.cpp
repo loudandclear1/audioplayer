@@ -4,6 +4,7 @@ WlVideo::WlVideo(WlPlaystatus *playstatus, WlCallJava *wlCallJava) {
     this->playstatus = playstatus;
     this->wlCallJava = wlCallJava;
     queue = new WlQueue(playstatus);
+    pthread_mutex_init(&codecMutex, NULL);
 }
 
 void *playVideo(void *data) {
@@ -11,6 +12,18 @@ void *playVideo(void *data) {
     WlVideo *video = static_cast<WlVideo *>(data);
 
     while (video->playstatus != NULL && !video->playstatus->exit) {
+
+        if(video->playstatus->seek)
+        {
+            av_usleep(1000 * 100);
+            continue;
+        }
+        if(video->playstatus->pause)
+        {
+            av_usleep(1000 * 100);
+            continue;
+        }
+
         if (video->queue->getQueueSize() == 0) {
             if (!video->playstatus->load) {
                 video->playstatus->load = true;
@@ -31,10 +44,14 @@ void *playVideo(void *data) {
             avPacket = NULL;
             continue;
         }
+
+        pthread_mutex_lock(&video->codecMutex);
+
         if (avcodec_send_packet(video->avCodecContext, avPacket) != 0) {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
+            pthread_mutex_unlock(&video->codecMutex);
             continue;
         }
         AVFrame *avFrame = av_frame_alloc();
@@ -45,6 +62,7 @@ void *playVideo(void *data) {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
+            pthread_mutex_unlock(&video->codecMutex);
             continue;
         }
         LOGE("子线程解码一个AVframe成功");
@@ -91,6 +109,7 @@ void *playVideo(void *data) {
                 av_frame_free(&pFrameYUV420P);
                 av_free(pFrameYUV420P);
                 av_free(buffer);
+                pthread_mutex_unlock(&video->codecMutex);
                 continue;
             }
             sws_scale(
@@ -127,6 +146,7 @@ void *playVideo(void *data) {
         av_packet_free(&avPacket);
         av_free(avPacket);
         avPacket = NULL;
+        pthread_mutex_unlock(&video->codecMutex);
     }
 
     pthread_exit(&video->thread_play);
@@ -157,7 +177,7 @@ void WlVideo::release() {
 }
 
 WlVideo::~WlVideo() {
-
+    pthread_mutex_destroy(&codecMutex);
 }
 
 double WlVideo::getFrameDiffTime(AVFrame *avFrame) {

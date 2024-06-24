@@ -42,8 +42,7 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1prepared(JNIEnv *env, jobject thiz, 
     }
 }
 
-void *startCallBack(void *data)
-{
+void *startCallBack(void *data) {
     WlFFmpeg *fFmpeg = (WlFFmpeg *) data;
     fFmpeg->start();
     pthread_exit(&thread_start);
@@ -76,7 +75,7 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1resume(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_hgz_audioplayer_player_WlPlayer_n_1stop(JNIEnv *env, jobject thiz) {
-    if(!native_exit) {
+    if (!native_exit) {
         return;
     }
     native_exit = false;
@@ -94,4 +93,13 @@ Java_com_hgz_audioplayer_player_WlPlayer_n_1stop(JNIEnv *env, jobject thiz) {
         }
     }
     native_exit = true;
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_hgz_audioplayer_player_WlPlayer_n_1seek(JNIEnv *env, jobject thiz, jint seconds) {
+
+    if (fFmpeg != NULL) {
+        fFmpeg->seek(seconds);
+    }
+
 }

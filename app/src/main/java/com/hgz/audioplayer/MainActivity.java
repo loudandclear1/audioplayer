@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.hgz.audioplayer.listener.WlOnLoadListener;
@@ -30,6 +31,11 @@ public class MainActivity extends AppCompatActivity {
 
     private WlGLSurfaceView wlGLSurfaceView;
 
+    private SeekBar seekBar;
+
+    private int position;
+    private boolean seek = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tvTime = findViewById(R.id.tv_time);
         wlGLSurfaceView = findViewById(R.id.wlglsurfaceview);
+        seekBar = findViewById(R.id.seekbar);
         wlPlayer = new WlPlayer();
         wlPlayer.setWlGLSurfaceView(wlGLSurfaceView);
 
@@ -75,6 +82,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                position = progress * wlPlayer.getDuration() / 100;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                seek = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                wlPlayer.seek(position);
+                seek = false;
+            }
+        });
+
     }
 
     @SuppressLint("SdCardPath")
@@ -101,6 +126,11 @@ public class MainActivity extends AppCompatActivity {
                 WlTimeInfoBean wlTimeInfoBean = (WlTimeInfoBean) msg.obj;
                 tvTime.setText(WlTimeUtil.secdsToDateFormat(wlTimeInfoBean.getTotalTime(), wlTimeInfoBean.getTotalTime())
                         + "/" + WlTimeUtil.secdsToDateFormat(wlTimeInfoBean.getCurrentTime(), wlTimeInfoBean.getTotalTime()));
+
+
+                if (!seek && wlTimeInfoBean.getTotalTime() > 0) {
+                    seekBar.setProgress(wlTimeInfoBean.getCurrentTime() * 100 / wlTimeInfoBean.getTotalTime());
+                }
             }
         }
     };

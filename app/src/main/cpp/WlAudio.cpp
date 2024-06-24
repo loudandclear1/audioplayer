@@ -6,10 +6,11 @@ WlAudio::WlAudio(WlPlaystatus *playstatus, int sample_rate, WlCallJava *callJava
     this->sample_rate = sample_rate;
     queue = new WlQueue(playstatus);
     buffer = (uint8_t *) av_malloc(sample_rate * 2 * 2);
+    pthread_mutex_init(&codecMutex, NULL);
 }
 
 WlAudio::~WlAudio() {
-
+    pthread_mutex_destroy(&codecMutex);
 }
 
 void *decodePlay(void *data) {
@@ -45,11 +46,14 @@ int WlAudio::resampleAudio() {
             avPacket = NULL;
             continue;
         }
+
+        pthread_mutex_lock(&codecMutex);
         ret = avcodec_send_packet(avCodecContext, avPacket);
         if (ret != 0) {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
+            pthread_mutex_unlock(&codecMutex);
             continue;
         }
 
@@ -81,6 +85,7 @@ int WlAudio::resampleAudio() {
                 av_free(avFrame);
                 avFrame = NULL;
                 swr_free(&swr_ctx);
+                pthread_mutex_unlock(&codecMutex);
                 continue;
             }
 
@@ -105,6 +110,7 @@ int WlAudio::resampleAudio() {
             av_free(avFrame);
             avFrame = NULL;
             swr_free(&swr_ctx);
+            pthread_mutex_unlock(&codecMutex);
             break;
         } else {
             av_packet_free(&avPacket);
@@ -113,6 +119,7 @@ int WlAudio::resampleAudio() {
             av_frame_free(&avFrame);
             av_free(avFrame);
             avFrame = NULL;
+            pthread_mutex_unlock(&codecMutex);
             continue;
         }
 

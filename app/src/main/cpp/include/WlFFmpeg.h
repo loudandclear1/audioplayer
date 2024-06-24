@@ -28,14 +28,22 @@ public:
 
 public:
     WlFFmpeg(WlPlaystatus *playstatus, WlCallJava *callJava, const char *url);
+
     ~WlFFmpeg();
 
     void prepared();
+
     void decodeFFmpegThread();
+
     void start();
+
     void pause();
+
     void resume();
+
     void release();
+
+    void seek(int64_t seconds);
 
     int getCodecContext(AVCodecParameters *codecpar, AVCodecContext **avCodecContext);
 };
