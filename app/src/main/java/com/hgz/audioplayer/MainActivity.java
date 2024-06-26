@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -18,6 +20,9 @@ import com.hgz.audioplayer.listener.WlOnTimeInfoListener;
 import com.hgz.audioplayer.opengl.WlGLSurfaceView;
 import com.hgz.audioplayer.player.WlPlayer;
 import com.hgz.audioplayer.util.WlTimeUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,8 +40,11 @@ public class MainActivity extends AppCompatActivity {
 
     private int position;
     private boolean seek = false;
+    private List<String> videoPaths;
+    private ListView videoList;
 
 
+    @SuppressLint("SdCardPath")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         tvTime = findViewById(R.id.tv_time);
         wlGLSurfaceView = findViewById(R.id.wlglsurfaceview);
         seekBar = findViewById(R.id.seekbar);
+        videoList = findViewById(R.id.video_list);
         wlPlayer = new WlPlayer();
         wlPlayer.setWlGLSurfaceView(wlGLSurfaceView);
 
@@ -100,11 +109,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        videoPaths = new ArrayList<>();
+        videoPaths.add("/sdcard/1.mp4");
+        videoPaths.add("http://www.w3school.com.cn/example/html5/mov_bbb.mp4");
+        videoPaths.add("/sdcard/2.MP4");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, videoPaths);
+        videoList.setAdapter(adapter);
+
+        videoList.setOnItemClickListener((parent, view, position, id) -> {
+            String videoPath = videoPaths.get(position);
+            wlPlayer.setSource(videoPath);
+        });
     }
 
-    @SuppressLint("SdCardPath")
     public void begin(View view) {
-        wlPlayer.setSource("/sdcard/oceans.mp4");
         wlPlayer.prepared();
     }
 

@@ -145,7 +145,7 @@ void WlFFmpeg::start() {
             av_packet_free(&avPacket);
             av_free(avPacket);
             while (playstatus != NULL && !playstatus->exit) {
-                if (audio->queue->getQueueSize() > 0) {
+                if (audio->queue->getQueueSize() > 0 || video->queue->getQueueSize() > 0) {
                     av_usleep(1000 * 100);
                     continue;
                 } else {

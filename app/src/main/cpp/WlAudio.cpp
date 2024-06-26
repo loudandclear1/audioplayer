@@ -27,8 +27,7 @@ int WlAudio::resampleAudio() {
     data_size = 0;
     while (playstatus != NULL && !playstatus->exit) {
 
-        if(playstatus->seek)
-        {
+        if (playstatus->seek) {
             av_usleep(1000 * 100);
             continue;
         }

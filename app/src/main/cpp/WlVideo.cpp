@@ -120,7 +120,7 @@ void *playVideo(void *data) {
                     pFrameYUV420P->linesize
             );
 
-            double diff = video->getFrameDiffTime(avFrame);
+            double diff = video->getFrameDiffTime(pFrameYUV420P);
             LOGE("diff is %f", diff);
 
             av_usleep(video->getDelayTime(diff) * 1000000);
@@ -181,6 +181,7 @@ WlVideo::~WlVideo() {
 }
 
 double WlVideo::getFrameDiffTime(AVFrame *avFrame) {
+
     double pts = avFrame->best_effort_timestamp;
     if (pts == AV_NOPTS_VALUE) {
         pts = 0;
@@ -192,19 +193,21 @@ double WlVideo::getFrameDiffTime(AVFrame *avFrame) {
     }
 
     double diff = audio->clock - clock;
+
     return diff;
 }
 
 double WlVideo::getDelayTime(double diff) {
+
     if (diff > 0.003) {
-        delayTime = delayTime / 4;
+        delayTime = delayTime * 2 / 3;
         if (delayTime < defaultDelayTime / 2) {
             delayTime = defaultDelayTime / 2;
         } else if (delayTime > defaultDelayTime * 2) {
             delayTime = defaultDelayTime * 2;
         }
     } else if (diff < -0.003) {
-        delayTime = delayTime * 0.25;
+        delayTime = delayTime * 3 / 2;
         if (delayTime > defaultDelayTime * 2) {
             delayTime = defaultDelayTime * 2;
         } else if (delayTime < defaultDelayTime / 2) {
@@ -213,9 +216,9 @@ double WlVideo::getDelayTime(double diff) {
     }
 
     if (diff >= 0.5) {
-        delayTime = defaultDelayTime / 1.5;
+        delayTime = defaultDelayTime / 4;
     } else if (diff <= -0.5) {
-        delayTime = defaultDelayTime * 1.5;
+        delayTime = defaultDelayTime * 4;
     }
 
     return delayTime;
