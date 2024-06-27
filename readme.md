@@ -429,5 +429,10 @@ WlPlayer.java
 wlGLSurfaceView.setYUVData(width, height, y, u, v);
 ```
 
-播放视频
+openGl渲染视频
 
+
+
+### 架构图
+
+![架构图](./image/架构图.png)
